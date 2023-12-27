@@ -15,10 +15,12 @@ COLORS = {
 
 
 def cmatrix():
-    # Initialize empty screen
-    screen = [[' ' for _ in range(80)] for _ in range(25)]
+    # Initialize empty screen with a more efficient data structure
+    screen = {}
+    for y in range(25):
+        screen[y] = {}
 
-    # Define character fall speeds
+    # Define character fall speeds with a focus on slower speeds
     speeds = {
         "slow": 0.3,
         "medium": 0.2,
@@ -26,37 +28,35 @@ def cmatrix():
     }
 
     while True:
-        # Add new characters with varying spawn rate and speed
-        for i in range(random.randint(2, 4)):
+        # Add new characters with adjusted spawn rate
+        for i in range(random.randint(1, 3)):  # Slightly reduced spawn rate
             column = random.randint(0, 79)
             color_choice = random.choice(list(COLORS.keys()))
             character = chr(random.randint(33, 126))
-            fall_speed = random.choice(list(speeds.keys()))
+            fall_speed = random.choice(["slow", "slow", "slow", "medium", "fast"])  # Favor slower speeds
             screen[0][column] = f"{COLORS[color_choice]}{character}@{fall_speed}"
 
         # Shift characters down based on their individual speeds
         for y in range(24, 0, -1):
             for x in range(80):
-                if screen[y-1][x].endswith("@"):
-                    # Extract speed from character string
+                if screen[y-1].get(x) and screen[y-1][x].endswith("@"):
                     current_speed = float(screen[y-1][x].split("@")[-1])
                     if y + current_speed < 25:
                         screen[y][x] = screen[y-1][x][:-1] + "@" + str(current_speed)
                     else:
-                        screen[y][x] = " "
-                else:
-                    screen[y][x] = screen[y-1][x]
+                        del screen[y][x]  # Efficiently remove characters at the bottom
 
-        # Print the current screen with color reset
-        for line in screen:
-            print(''.join([char.split("@")[0] for char in line]), end='')
+        # Print the current screen with optimized output
+        lines = [
+            ''.join([char.split("@")[0] for char in screen.get(y, {}).values()])
+            for y in range(25)
+        ]
+        print('\n'.join(lines))
         print("\033[0m")  # Reset color before new line
-
-        # Clear the output buffer
         sys.stdout.flush()
 
-        # Adjust delay for natural flow
-        time.sleep(0.05)
+        # Increased delay for smoother perceived speed
+        time.sleep(0.1)
 
 
 if __name__ == "__main__":
