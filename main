@@ -1,0 +1,14 @@
+import random
+import time
+import sys
+
+def cmatrix():
+    """Prints a continuous stream of falling green characters."""
+    while True:
+        for i in range(random.randint(4, 8)):
+            print(chr(random.randint(33, 126)), end='')
+        sys.stdout.flush()  # Ensure characters are displayed immediately
+        time.sleep(0.05)  # Adjust for desired speed
+
+if __name__ == "__main__":
+    cmatrix()
